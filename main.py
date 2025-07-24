@@ -37,7 +37,7 @@ if st.button("💬 Envoyer à Synapso"):
         try:
             model = "gpt-4" if mode == "🔥 GPT-4 Premium" else "gpt-3.5-turbo"
 
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model=model,
                 messages=[
                     {"role": "system", "content": "Tu es un assistant juridique spécialisé en droit du travail français. Réponds de manière simple et concrète aux salariés."},
@@ -47,7 +47,7 @@ if st.button("💬 Envoyer à Synapso"):
 
             # ✅ Affichage de la réponse
             st.success("✅ Réponse de Synapso :")
-            st.markdown(response["choices"][0]["message"]["content"])
+            st.markdown(response.choices[0].message.content)
 
         except Exception as e:
             st.error(f"❌ Une erreur est survenue : {e}")
