@@ -1,4 +1,4 @@
-from supabase import create_client as supabase_create
+from supabase import create_client
 
 def create_client(url, key):
-    return supabase_create(url, key)
+    return create_client(url, key)
