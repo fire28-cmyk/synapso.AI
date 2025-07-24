@@ -1,8 +1,15 @@
 import streamlit as st
 from openai import OpenAI
+from auth import login, get_user
+from supabase import create_client
 
-# ✅ Clé API via secrets
+# ✅ Clés API
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+supabase = create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
+
+# 🔐 Connexion utilisateur
+login()
+user = get_user()
 
 # ⚙️ Configuration de la page
 st.set_page_config(
@@ -32,15 +39,6 @@ question = st.text_area("✍️ Votre question ici :")
 # ✅ Initialiser l'historique
 if "historique" not in st.session_state:
     st.session_state.historique = []
-if user:
-    try:
-        supabase.table("conversations").insert({
-            "user_id": user["id"],
-            "question": question,
-            "answer": reponse_texte
-        }).execute()
-    except Exception as db_error:
-        st.warning("⚠️ Erreur lors de l'enregistrement dans la base.")
 
 # 🗑️ Bouton pour effacer l’historique
 if st.button("🗑️ Effacer l'historique"):
@@ -64,6 +62,17 @@ if st.button("💬 Envoyer à Synapso"):
 
             reponse_texte = response.choices[0].message.content
             st.session_state.historique.append((question, reponse_texte))
+
+            # ✅ Enregistrement Supabase
+            if user:
+                try:
+                    supabase.table("conversations").insert({
+                        "user_id": user["id"],
+                        "question": question,
+                        "answer": reponse_texte
+                    }).execute()
+                except Exception as db_error:
+                    st.warning("⚠️ Erreur lors de l'enregistrement dans la base.")
 
         except Exception as e:
             st.error(f"❌ Une erreur est survenue : {e}")
