@@ -2,7 +2,6 @@
 import streamlit as st
 from openai import OpenAI
 from supabase import create_client, Client
-import os
 
 # --- Clés API depuis secrets Streamlit ---
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
@@ -14,8 +13,8 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 # --- Interface utilisateur ---
-st.set_page_config(page_title="Synapso - Droit du Travail 🇫🇷")
-st.title("📘 Synapso - Assistant Droit du Travail 🇫🇷")
+st.set_page_config(page_title="Synapso - Droit du Travail FR")
+st.title("📘 Synapso - Assistant Droit du Travail")
 
 # --- Authentification ---
 email = st.text_input("Ton adresse e-mail")
@@ -23,21 +22,7 @@ email = st.text_input("Ton adresse e-mail")
 if st.button("Se connecter"):
     try:
         supabase.auth.sign_in_with_otp({"email": email})
-        st.success("📩 Un e-mail de connexion a ete envoye.")
-    except Exception as e:
-        st.error(f"Erreur d'envoi : {e}")
-
-
-user = supabase.auth.get_user()
-user_id = user.user.id if user and user.user else None
-
-if user_id:
-    question = st.text_input("Pose ta question sur le droit du travail")
-
-   if st.button("Se connecter"):
-    try:
-        supabase.auth.sign_in_with_otp({"email": email})
-        st.success("📩 Un e-mail de connexion a ete envoye.")
+        st.success("Un e-mail de connexion a ete envoye.")
     except Exception as e:
         st.error(f"Erreur d'envoi : {e}")
 
@@ -58,7 +43,7 @@ if user_id:
             )
 
             reponse_texte = response.choices[0].message.content
-            st.success("✅ Reponse de Synapso :")
+            st.success("Reponse de Synapso :")
             st.markdown(reponse_texte)
 
             # Enregistrement dans Supabase
@@ -72,6 +57,4 @@ if user_id:
         except Exception as e:
             st.error(f"Erreur OpenAI ou Supabase : {e}")
 else:
-   # ❌ st.info("🟡 Connecte-toi pour utiliser Synapso.")
-# ✅
-st.info("🟡 Connecte toi pour utiliser Synapso.")
+    st.info("Connecte toi pour utiliser Synapso.")
