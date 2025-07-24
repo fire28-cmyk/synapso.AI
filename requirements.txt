@@ -1,3 +1,4 @@
 streamlit
 openai
 stripe
+supabase==1.0.3
