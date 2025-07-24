@@ -1,25 +1,53 @@
 import streamlit as st
 import openai
 
-st.set_page_config(page_title="Synapso - Droits des salariés", layout="centered")
+# 💡 Mets ta vraie clé OpenAI ici
+openai.api_key = "sk-votre_clé_openai_ici"
 
-st.title("\U0001F4D8 Synapso - Assistant Droit du Travail \U0001F1EB\U0001F1F7")
+# ⚙️ Configuration générale de la page
+st.set_page_config(
+    page_title="Synapso - Assistant Droit du Travail 🇫🇷",
+    page_icon="📘",
+    layout="wide"
+)
 
-openai.api_key = st.secrets.get("OPENAI_API_KEY")
+# 🔧 Barre latérale
+st.sidebar.title("⚙️ Paramètres Synapso")
+mode = st.sidebar.radio("Choisissez un mode :", ["💬 GPT-3.5 Gratuit", "🔥 GPT-4 Premium"])
+st.sidebar.markdown("---")
 
-question = st.text_input("Pose ta question (arrêt maladie, licenciement, congés, salaire, etc.)")
+# 🧾 Affichage des avantages selon le mode
+if mode == "🔥 GPT-4 Premium":
+    st.sidebar.success("✅ **Avantages Premium** :\n\n- GPT-4 Turbo\n- Réponses plus détaillées\n- Moins de limitations\n- Accès prioritaire")
+else:
+    st.sidebar.info("🆓 **Version Gratuite (GPT-3.5)** :\n\n- Réponses standards\n- Accès limité")
 
-if question:
-    with st.spinner("Synapso réfléchit..."):
+# 🧠 Titre principal
+st.title("📘 Synapso - Assistant Droit du Travail 🇫🇷")
+st.markdown("Pose ta question (arrêt maladie, licenciement, congés, salaire, etc.)")
+
+# 🗨️ Zone de question
+question = st.text_area("✍️ Votre question ici :")
+
+# ▶️ Bouton d'envoi
+if st.button("💬 Envoyer à Synapso"):
+    if question.strip() == "":
+        st.warning("❗ Merci de poser une vraie question.")
+    else:
         try:
+            model = "gpt-4" if mode == "🔥 GPT-4 Premium" else "gpt-3.5-turbo"
+
             response = openai.ChatCompletion.create(
-                model="gpt-4",
+                model=model,
                 messages=[
-                    {"role": "system", "content": "Tu es un assistant expert en droit du travail français. Réponds de manière simple, claire et concrète aux salariés."},
+                    {"role": "system", "content": "Tu es un assistant juridique spécialisé en droit du travail français. Réponds de manière simple et concrète aux salariés."},
                     {"role": "user", "content": question}
                 ]
             )
-            st.success("\u2705 Réponse de Synapso :")
+
+            # ✅ Affichage de la réponse
+            st.success("✅ Réponse de Synapso :")
             st.markdown(response["choices"][0]["message"]["content"])
+
         except Exception as e:
-            st.error("\u274C Une erreur est survenue.")
+            st.error(f"❌ Une erreur est survenue : {e}")
