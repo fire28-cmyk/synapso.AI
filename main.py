@@ -5,6 +5,8 @@ from supabase_client import get_supabase_client
 
 # 🔑 Initialisation des clients
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+login()
+user = get_user()
 supabase = get_supabase_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
 
 # 🔐 Connexion utilisateur
