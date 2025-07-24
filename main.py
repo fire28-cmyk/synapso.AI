@@ -1,36 +1,25 @@
-
 import streamlit as st
-import requests
-from legifrance import get_token
+import openai
 
-st.set_page_config(page_title="Synapso - Droit du travail", layout="centered")
+st.set_page_config(page_title="Synapso - Droits des salariés", layout="centered")
 
-st.title("📘 Synapso - Assistant Droit du Travail 🇫🇷")
+st.title("\U0001F4D8 Synapso - Assistant Droit du Travail \U0001F1EB\U0001F1F7")
 
-token = get_token()
+openai.api_key = st.secrets.get("OPENAI_API_KEY")
 
-if not token:
-    st.error("❌ Impossible d'obtenir le token d'accès à l'API Légifrance.")
-else:
-    st.success("✅ Connexion API Légifrance réussie.")
+question = st.text_input("Pose ta question (arrêt maladie, licenciement, congés, salaire, etc.)")
 
-    article_id = st.text_input("Entrez l'identifiant d'un article Légifrance (ex: LEGITEXT000006072050):")
-
-    if article_id:
-        headers = {
-            "Authorization": f"Bearer {token}",
-            "Content-Type": "application/json"
-        }
-
-        payload = {
-            "id": article_id
-        }
-
-        url = "https://sandbox-api.piste.gouv.fr/dila/legifrance/lf-engine-app/consult/getArticle"
-        response = requests.post(url, headers=headers, json=payload)
-
-        if response.status_code == 200:
-            st.subheader("📄 Contenu de l'article :")
-            st.json(response.json())
-        else:
-            st.error(f"Erreur API : {response.status_code}")
+if question:
+    with st.spinner("Synapso réfléchit..."):
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "Tu es un assistant expert en droit du travail français. Réponds de manière simple, claire et concrète aux salariés."},
+                    {"role": "user", "content": question}
+                ]
+            )
+            st.success("\u2705 Réponse de Synapso :")
+            st.markdown(response["choices"][0]["message"]["content"])
+        except Exception as e:
+            st.error("\u274C Une erreur est survenue.")
