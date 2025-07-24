@@ -2,17 +2,18 @@ import streamlit as st
 from openai import OpenAI
 from auth import login, get_user
 from supabase_client import get_supabase_client
-supabase = get_supabase_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
-# 🔑 Initialisation des clients API
+
+# 🔑 Initialisation des clients
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 supabase = get_supabase_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
+
 # 🔐 Connexion utilisateur
 login()
 user = get_user()
 
 # ⚙️ Configuration de la page
 st.set_page_config(
-    page_title="Synapso - Assistant Droit du Travail 🇫🇷",
+    page_title="Synapso - Assistant IA 🇫🇷",
     page_icon="📘",
     layout="wide"
 )
@@ -20,6 +21,7 @@ st.set_page_config(
 # 🔧 Barre latérale
 st.sidebar.title("⚙️ Paramètres Synapso")
 mode = st.sidebar.radio("Choisissez un mode :", ["💬 GPT-3.5 Gratuit", "🔥 GPT-4 Premium"])
+assistant_type = st.sidebar.radio("Type d'assistant :", ["👨‍⚖️ Juridique", "🧠 Généraliste"])
 st.sidebar.markdown("---")
 
 # 🧾 Avantages affichés selon le mode
@@ -29,8 +31,8 @@ else:
     st.sidebar.info("🆓 **Version Gratuite (GPT-3.5)** :\n\n- Réponses standards\n- Accès limité")
 
 # 🧠 Titre principal
-st.title("📘 Synapso - Assistant Droit du Travail 🇫🇷")
-st.markdown("Pose ta question (arrêt maladie, licenciement, congés, salaire, etc.)")
+st.title("📘 Synapso - Assistant IA 🇫🇷")
+st.markdown("Pose ta question (arrêt maladie, licenciement, congés, ou toute autre question générale).")
 
 # 🗨️ Zone de texte
 question = st.text_area("✍️ Votre question ici :")
@@ -51,10 +53,15 @@ if st.button("💬 Envoyer à Synapso"):
         try:
             model = "gpt-4" if mode == "🔥 GPT-4 Premium" else "gpt-3.5-turbo"
 
+            if assistant_type == "👨‍⚖️ Juridique":
+                system_message = "Tu es un assistant juridique spécialisé en droit du travail français. Réponds de manière simple et concrète aux salariés."
+            else:
+                system_message = "Tu es un assistant intelligent, bienveillant et compétent. Réponds simplement à toutes les questions que l'utilisateur pourrait avoir."
+
             response = client.chat.completions.create(
                 model=model,
                 messages=[
-                    {"role": "system", "content": "Tu es un assistant juridique spécialisé en droit du travail français. Réponds de manière simple et concrète aux salariés."},
+                    {"role": "system", "content": system_message},
                     {"role": "user", "content": question}
                 ]
             )
