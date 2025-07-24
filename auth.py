@@ -1,12 +1,17 @@
 import streamlit as st
+from supabase import create_client
+
+# Connexion à Supabase
+SUPABASE_URL = st.secrets["SUPABASE_URL"]
+SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def login():
-    if "user_email" not in st.session_state:
-        st.session_state.user_email = st.text_input("✉️ Adresse e-mail")
-        if st.button("🔐 Se connecter"):
-            st.success(f"Connecté comme {st.session_state.user_email}")
+    st.sidebar.subheader("🔐 Connexion / Inscription")
+    email = st.sidebar.text_input("Adresse e-mail", key="email")
+    if st.sidebar.button("📩 Recevoir un lien de connexion"):
+        res = supabase.auth.sign_in_with_otp({"email": email})
+        st.sidebar.success("📬 Lien de connexion envoyé ! Vérifie ta boîte mail.")
 
 def get_user():
-    if "user_email" in st.session_state:
-        return {"id": st.session_state.user_email}
-    return None
+    return supabase.auth.get_user().user
