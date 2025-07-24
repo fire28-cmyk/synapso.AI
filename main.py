@@ -1,68 +1,37 @@
+
 import streamlit as st
-from openai import OpenAI
+import requests
+from legifrance import get_token
 
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+st.set_page_config(page_title="Synapso - Droit du travail", layout="centered")
 
-st.set_page_config(page_title="Synapso - IA de conversation", layout="centered")
-st.title("🤖 Synapso - Votre Assistant IA")
+st.title("📘 Synapso - Assistant Droit du Travail 🇫🇷")
 
-# Sélection du niveau d'accès utilisateur
-user_type = st.sidebar.radio("Choisissez votre accès :", ["Gratuit (GPT-3.5)", "Premium (GPT-4)"])
+token = get_token()
 
-with st.sidebar:
-    st.markdown("---")
-    st.markdown("### ✨ Avantages Premium")
-    st.markdown("""
-- Accès à GPT-4 🤖
-- Réponses plus rapides ⚡
-- Historique illimité 🧠
-- Aucune limite de messages ⛔️
-- Support vocal (à venir) 🎤
-""")
-
-# Sélection du modèle
-if user_type == "Gratuit (GPT-3.5)":
-    selected_model = "gpt-3.5-turbo"
+if not token:
+    st.error("❌ Impossible d'obtenir le token d'accès à l'API Légifrance.")
 else:
-    selected_model = "gpt-4"
-    st.markdown("### 🔐 Connexion ou création de compte requise pour le mode Premium")
-    mode_connexion = st.radio("Choisissez une option :", ["Se connecter", "Créer un compte"])
-    email = st.text_input("Adresse e-mail :")
-    password = st.text_input("Mot de passe :", type="password")
-    if not email or not password:
-        st.warning("Veuillez remplir tous les champs pour continuer.")
-        st.stop()
-    else:
-        if mode_connexion == "Se connecter":
-            st.success(f"Connecté en tant que : {email}")
+    st.success("✅ Connexion API Légifrance réussie.")
+
+    article_id = st.text_input("Entrez l'identifiant d'un article Légifrance (ex: LEGITEXT000006072050):")
+
+    if article_id:
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+
+        payload = {
+            "id": article_id
+        }
+
+        url = "https://sandbox-api.piste.gouv.fr/dila/legifrance/consult/getArticleWithIdEliOrAlias"
+
+        response = requests.post(url, headers=headers, json=payload)
+
+        if response.status_code == 200:
+            st.subheader("📄 Contenu de l'article :")
+            st.json(response.json())
         else:
-            st.success(f"Compte créé avec succès pour : {email}")
-
-# Historique
-if "messages" not in st.session_state:
-    st.session_state.messages = [{"role": "system", "content": "Tu es une IA polie, amicale et efficace."}]
-
-# Affichage des anciens messages
-for msg in st.session_state.messages[1:]:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
-
-# Saisie utilisateur
-if prompt := st.chat_input("Posez votre question à Synapso..."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-
-    try:
-        response = client.chat.completions.create(
-            model=selected_model,
-            messages=st.session_state.messages
-        )
-        reply = response.choices[0].message.content
-    except Exception as e:
-        reply = f"Erreur API : {e}"
-
-    st.session_state.messages.append({"role": "assistant", "content": reply})
-    with st.chat_message("assistant"):
-        st.markdown(reply)
-
+            st.error(f"Erreur API : {response.status_code}")
