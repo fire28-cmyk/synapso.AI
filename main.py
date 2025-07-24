@@ -26,8 +26,7 @@ else:
             "id": article_id
         }
 
-        url = "https://sandbox-api.piste.gouv.fr/dila/legifrance/consult/getArticleWithIdEliOrAlias"
-
+        url = "https://sandbox-api.piste.gouv.fr/dila/legifrance/lf-engine-app/consult/getArticle"
         response = requests.post(url, headers=headers, json=payload)
 
         if response.status_code == 200:
