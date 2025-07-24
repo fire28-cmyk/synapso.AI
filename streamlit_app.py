@@ -34,18 +34,31 @@ user_id = user.user.id if user and user.user else None
 if user_id:
     question = st.text_input("Pose ta question sur le droit du travail")
 
+   if st.button("Se connecter"):
+    try:
+        supabase.auth.sign_in_with_otp({"email": email})
+        st.success("📩 Un e-mail de connexion a ete envoye.")
+    except Exception as e:
+        st.error(f"Erreur d'envoi : {e}")
+
+user = supabase.auth.get_user()
+user_id = user.user.id if user and user.user else None
+
+if user_id:
+    question = st.text_input("Pose ta question sur le droit du travail")
+
     if st.button("Envoyer"):
         try:
             response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "Tu es un assistant en droit du travail français."},
+                    {"role": "system", "content": "Tu es un assistant en droit du travail francais."},
                     {"role": "user", "content": question}
                 ]
             )
 
             reponse_texte = response.choices[0].message.content
-            st.success("✅ Réponse de Synapso :")
+            st.success("✅ Reponse de Synapso :")
             st.markdown(reponse_texte)
 
             # Enregistrement dans Supabase
@@ -59,4 +72,6 @@ if user_id:
         except Exception as e:
             st.error(f"Erreur OpenAI ou Supabase : {e}")
 else:
-    st.info("🟡 Connecte-toi pour utiliser Synapso.")
+   # ❌ st.info("🟡 Connecte-toi pour utiliser Synapso.")
+# ✅
+st.info("🟡 Connecte toi pour utiliser Synapso.")
