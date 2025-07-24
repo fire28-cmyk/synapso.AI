@@ -22,10 +22,10 @@ email = st.text_input("Ton adresse e-mail")
 
 if st.button("Se connecter"):
     try:
-supabase.auth.sign_in_with_otp({"email": email})
-st.success("📩 Un e-mail de connexion t’a été envoyé.")
+        supabase.auth.sign_in_with_otp({"email": email})
+        st.success("📬 Un e-mail de connexion t’a été envoyé.")
     except Exception as e:
-        st.error(f"Erreur d’envoi : {e}")
+        st.error(f"❌ Erreur d’envoi : {e}")
 
 user = supabase.auth.get_user()
 user_id = user.user.id if user and user.user else None
