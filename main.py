@@ -1,9 +1,9 @@
 import streamlit as st
 import openai
+from openai import OpenAI
 
 # ✅ Clé API sécurisée via secrets (à configurer sur Streamlit Cloud)
-openai.api_key = st.secrets["OPENAI_API_KEY"]
-
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 # ⚙️ Configuration de la page
 st.set_page_config(
     page_title="Synapso - Assistant Droit du Travail 🇫🇷",
