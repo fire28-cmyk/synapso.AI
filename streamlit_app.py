@@ -1,4 +1,4 @@
-# CONTENU DE streamlit_app.py
+# -*- coding: utf-8 -*-
 import streamlit as st
 from openai import OpenAI
 from supabase import create_client, Client
