@@ -24,7 +24,7 @@ if st.button("🔓 Connexion par e-mail"):
     try:
         supabase.auth.sign_in_with_otp(
             {"email": email},
-            options={"email_redirect_to": "https://synapsoai-zemaxu86hodc5ord9b5fsc.streamlit.app"}
+            
         )
         st.success("📨 E-mail de connexion envoyé !")
     except Exception as e:
