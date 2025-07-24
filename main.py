@@ -1,11 +1,8 @@
 import streamlit as st
 from openai import OpenAI
 from auth import login, get_user
-from supabase_client import create_client
-
-# ✅ Clés API
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-supabase = create_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
+from supabase_client import get_supabase_client
+supabase = get_supabase_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
 
 # 🔐 Connexion utilisateur
 login()
