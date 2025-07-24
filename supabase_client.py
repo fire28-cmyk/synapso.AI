@@ -1,5 +1,4 @@
-from supabase import create_client
+from supabase import create_client as supabase_create
 
-# ✅ Fonction pour retourner un client Supabase sans créer une boucle infinie
 def get_supabase_client(url, key):
-    return create_client(url, key)
+    return supabase_create(url, key)
