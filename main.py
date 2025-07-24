@@ -1,9 +1,9 @@
 import streamlit as st
-import openai
 from openai import OpenAI
 
-# ✅ Clé API sécurisée via secrets (à configurer sur Streamlit Cloud)
+# ✅ Clé API via secrets
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+
 # ⚙️ Configuration de la page
 st.set_page_config(
     page_title="Synapso - Assistant Droit du Travail 🇫🇷",
@@ -29,6 +29,14 @@ st.markdown("Pose ta question (arrêt maladie, licenciement, congés, salaire, e
 # 🗨️ Zone de texte
 question = st.text_area("✍️ Votre question ici :")
 
+# ✅ Initialiser l'historique
+if "historique" not in st.session_state:
+    st.session_state.historique = []
+
+# 🗑️ Bouton pour effacer l’historique
+if st.button("🗑️ Effacer l'historique"):
+    st.session_state.historique = []
+
 # ▶️ Bouton d'envoi
 if st.button("💬 Envoyer à Synapso"):
     if question.strip() == "":
@@ -45,9 +53,16 @@ if st.button("💬 Envoyer à Synapso"):
                 ]
             )
 
-            # ✅ Affichage de la réponse
-            st.success("✅ Réponse de Synapso :")
-            st.markdown(response.choices[0].message.content)
+            reponse_texte = response.choices[0].message.content
+            st.session_state.historique.append((question, reponse_texte))
 
         except Exception as e:
             st.error(f"❌ Une erreur est survenue : {e}")
+
+# 📜 Affichage de l'historique
+if st.session_state.historique:
+    st.subheader("📜 Historique des réponses")
+    for i, (q, r) in enumerate(reversed(st.session_state.historique), 1):
+        st.markdown(f"**{i}. Question :** {q}")
+        st.markdown(f"**Réponse :** {r}")
+        st.markdown("---")
