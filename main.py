@@ -3,7 +3,9 @@ from openai import OpenAI
 from auth import login, get_user
 from supabase_client import get_supabase_client
 supabase = get_supabase_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
-
+# 🔑 Initialisation des clients API
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+supabase = get_supabase_client(st.secrets["SUPABASE_URL"], st.secrets["SUPABASE_KEY"])
 # 🔐 Connexion utilisateur
 login()
 user = get_user()
