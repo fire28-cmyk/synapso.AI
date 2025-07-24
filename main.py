@@ -1,7 +1,7 @@
 import streamlit as st
 from openai import OpenAI
 from auth import login, get_user
-from supabase import create_client
+from supabase_client import create_client
 
 # ✅ Clés API
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
