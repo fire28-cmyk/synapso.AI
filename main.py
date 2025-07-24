@@ -32,6 +32,15 @@ question = st.text_area("✍️ Votre question ici :")
 # ✅ Initialiser l'historique
 if "historique" not in st.session_state:
     st.session_state.historique = []
+if user:
+    try:
+        supabase.table("conversations").insert({
+            "user_id": user["id"],
+            "question": question,
+            "answer": reponse_texte
+        }).execute()
+    except Exception as db_error:
+        st.warning("⚠️ Erreur lors de l'enregistrement dans la base.")
 
 # 🗑️ Bouton pour effacer l’historique
 if st.button("🗑️ Effacer l'historique"):
