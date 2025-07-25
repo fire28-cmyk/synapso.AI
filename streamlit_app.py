@@ -27,6 +27,7 @@ if st.button("Se connecter"):
         error_msg = str(e).encode("ascii", errors="ignore").decode()
         st.error("Erreur envoi : {}".format(error_msg))
 
+
 user = supabase.auth.get_user()
 user_id = user.user.id if user and user.user else None
 
