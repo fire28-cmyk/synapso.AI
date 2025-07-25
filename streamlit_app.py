@@ -1,13 +1,7 @@
 
-# -*- coding: utf-8 -*-
 import streamlit as st
 from openai import OpenAI
 from supabase import create_client, Client
-
-# Config UTF-8 explicit
-import sys
-import io
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # --- API keys from secrets ---
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
@@ -30,7 +24,8 @@ if st.button("Se connecter"):
         supabase.auth.sign_in_with_otp({"email": email})
         st.success("Mail de connexion envoye")
     except Exception as e:
-        st.error("Erreur envoi : {}".format(str(e)))
+        error_msg = str(e).encode("ascii", errors="ignore").decode()
+        st.error("Erreur envoi : {}".format(error_msg))
 
 user = supabase.auth.get_user()
 user_id = user.user.id if user and user.user else None
@@ -60,6 +55,7 @@ if user_id:
             supabase.table("conversations").insert(data).execute()
 
         except Exception as e:
-            st.error("Erreur OpenAI ou Supabase : {}".format(str(e)))
+            error_msg = str(e).encode("ascii", errors="ignore").decode()
+            st.error("Erreur OpenAI ou Supabase : {}".format(error_msg))
 else:
     st.info("Connecte toi pour utiliser Synapso")
